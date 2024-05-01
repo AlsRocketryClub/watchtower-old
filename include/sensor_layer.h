@@ -1,7 +1,7 @@
 /*
 -----------------------------------
 
-Source code for the ground station mission logic functions
+Header file for sensor integration
 
 Contributors: Arturo, Arkadiusz, Kyril, Hans
 The Als Rocketry Club

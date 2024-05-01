@@ -3,7 +3,7 @@
 
 Source code for sensor integration
 
-Contributors: Arturo, Kiryl, Hans, 
+Contributors: Arturo, Arkadiusz, Kyril, Hans
 The Als Rocketry Club
 Sonderborg, Denmark
 

@@ -1,7 +1,7 @@
 /*
 -----------------------------------
 
-Source code for the ground station mission logic functions
+Header file for managing configurations
 
 Contributors: Arturo, Arkadiusz, Kyril, Hans
 The Als Rocketry Club
