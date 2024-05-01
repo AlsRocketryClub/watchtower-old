@@ -1,7 +1,7 @@
 /*
 -----------------------------------
 
-Source code for managing communications to the rocket, including reading telemetry and sending commands
+Source code for telemetry data processing
 
 Contributors: Arturo, Kiryl, Hans
 The Als Rocketry Club

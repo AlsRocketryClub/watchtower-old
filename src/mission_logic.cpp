@@ -1,7 +1,7 @@
 /*
 -----------------------------------
 
-Source code for managing communications to the rocket, including reading telemetry and sending commands
+Source code for the ground station mission logic functions
 
 Contributors: Arturo, Kiryl, Hans
 The Als Rocketry Club

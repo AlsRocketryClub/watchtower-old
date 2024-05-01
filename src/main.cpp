@@ -1,7 +1,13 @@
 /*
+-----------------------------------
 
+Source code for the main functions of the ground station
 
+Contributors: Arturo, Kiryl, Hans
+The Als Rocketry Club
+Sonderborg, Denmark
 
+-----------------------------------
 */
 
 // Path: src/main.cpp
