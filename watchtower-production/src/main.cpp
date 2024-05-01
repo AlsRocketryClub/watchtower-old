@@ -13,10 +13,7 @@ Sonderborg, Denmark
 // Path: src/main.cpp
 // #include UI layer written in Python
 #include "communication_layer.h"
-
-int testReturn() {
-	return True;
-}
+#include "test_functions.h"
 
 int main() {
 	// Initialize UI and communication
@@ -26,4 +23,3 @@ int main() {
 
 	return 0;
 }
-```

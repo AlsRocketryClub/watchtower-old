@@ -10,6 +10,7 @@ Sonderborg, Denmark
 
 ## Table of contents (needed?)
 - [Description](#description)
+- [Folder structure](#folder-structure)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Main contributors](#main-contributors)
@@ -18,6 +19,10 @@ Sonderborg, Denmark
 
 ## Description
 Source code and for the "Watchtower" ground station managing launch, controls, data and communication to S3 and future rockets.
+
+---
+
+## Folder structure (TODO)
 
 ---
 
