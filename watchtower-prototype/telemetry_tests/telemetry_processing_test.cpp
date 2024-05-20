@@ -11,14 +11,17 @@ Telemetry parsing test
 #include <fstream>
 
 // Define structure to hold telemetry data
-struct TelemetryData {
-    int timestamp;
-    float altitude; // Altitude (meters)
-    float velocity; // Rocket velocity (m/s)
-    float acceleration; // Rocket acceleration (m/s^2)
-    float pressure; // Barometer
-    float latitude; // GPS
-    float longitude; // GPS
+// Note: Consider creating a JSON filed defining custom telemetry fields+types
+struct TelemetryPacket {
+    uint32_t timestamp; // ms (second timestamp * 1000)
+    uint32_t positionX; // mm (m * 1000)
+    uint32_t positionY; // mm (m * 1000)
+    uint32_t positionZ; // mm (m * 1000)
+    uint32_t velocity; // mm s^-1 (m s^-1 * 1000)
+    uint32_t acceleration; // mm s^-2 (m s^-2 * 1000)
+    uint32_t pressure; // mbar (bar * 1000)
+    int32_t latitude; // udeg (deg * 1000000)
+    int32_t longitude; // udeg (deg * 1000000)
 };
 
 // Helper function to extract telemetry from packet based on index
@@ -29,7 +32,7 @@ float ExtractTelemetry(const std::vector<uint8_t>& packet, int index) {
 
 // Circular buffer for temporary storage
 const int buffer_size = 100;
-std::vector<TelemetryData> telemetryBuffer;
+std::vector<TelemetryPacket> telemetryBuffer;
 
 // Process received LoRa packet
 void ProcessTelemetryPacket(const std::vector<uint8_t>& packet) {
@@ -40,7 +43,9 @@ void ProcessTelemetryPacket(const std::vector<uint8_t>& packet) {
 
     // Extract data from packet
     double timestamp = /* extract timestamp */;
-    double altitude = /* extract altitude */;
+    double positionX = /* extract position X */;
+    double positionY = /* extract position Y */;
+    double positionZ = /* extract position Z */;
     double velocity = /* extract velocity */;
     double acceleration = /* extract acceleration */;
     double pressure = /* extract pressure */;
@@ -48,9 +53,11 @@ void ProcessTelemetryPacket(const std::vector<uint8_t>& packet) {
     double longitude = /* extract longitude */;
 
     // Create telemetry data object
-    TelemetryData data;
+    TelemetryPacket data;
     data.timestamp = timestamp;
-    data.altitude = altitude;
+    data.positionX = positionX;
+    data.positionY = positionY;
+    data.positionZ = positionZ;
     data.velocity = velocity;
     data.acceleration = acceleration;
     data.pressure = pressure;
@@ -66,7 +73,7 @@ void ProcessTelemetryPacket(const std::vector<uint8_t>& packet) {
     // Log data to a file
     std::ofstream logFile("telemetry_log.csv", std::ios::app);
     if (logFile.is_open()) {
-        logFile << timestamp << "," << altitude << "," << velocity << "," << acceleration << "," << pressure << "," << latitude << "," << longitude << std::endl;
+        //logFile << timestamp << "," << altitude << "," << velocity << "," << acceleration << "," << pressure << "," << latitude << "," << longitude << std::endl;
         logFile.close();
     }
 }
