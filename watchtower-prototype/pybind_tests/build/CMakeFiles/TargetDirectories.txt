@@ -1,0 +1,4 @@
+D:/D drive Documents/GitHub/Code-Dei-Tech/Repos/arc-watchtower-hans/watchtower-prototype/pybind_tests/build/CMakeFiles/example.dir
+D:/D drive Documents/GitHub/Code-Dei-Tech/Repos/arc-watchtower-hans/watchtower-prototype/pybind_tests/build/CMakeFiles/ALL_BUILD.dir
+D:/D drive Documents/GitHub/Code-Dei-Tech/Repos/arc-watchtower-hans/watchtower-prototype/pybind_tests/build/CMakeFiles/ZERO_CHECK.dir
+D:/D drive Documents/GitHub/Code-Dei-Tech/Repos/arc-watchtower-hans/watchtower-prototype/pybind_tests/build/pybind11_build/CMakeFiles/ALL_BUILD.dir
