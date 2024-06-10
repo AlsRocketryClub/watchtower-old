@@ -1,0 +1,13 @@
+{
+    "image":"mcr.microsoft.com/devcontainers/universal:2",
+    "name": "Python 3",
+    "build": {
+      "dockerfile": "Dockerfile",
+      "args": { "VARIANT": "3" }
+    },
+    "settings": {
+      "pythonPath": "/usr/local/bin/python3",
+      "terminal.integrated.shell.linux": "/bin/bash",
+      "python.venvPath": "${workspaceFolder}/venv"
+    },
+}
