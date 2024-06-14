@@ -8,7 +8,15 @@ Communication test
 
 #include <iostream>
 
-// Constants
+// Packet structure for telemetry
+struct DataPacket {
+    double timestamp; // Time in milliseconds
+    double xPosition; double yPosition; double zPosition; // mm
+    double acceleration; // m/s^2
+    double gpsLatitude; double gpsLongitude; // degrees
+    int gpsSatellitesConnected; int gpsStatus;
+    int packetCount; // Number of packets sent for verification
+};
 
 // Initialize communications
 

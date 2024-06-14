@@ -35,6 +35,7 @@ double azimuthAngle = 0.0; double elevationAngle = 0.0;
 // Test - Filename of trajectory data
 std::string trajectoryFilename = "test_flight.csv";
 
+
 // Test - Generate test timeseries
 std::vector<double> generateTestTimeseries() { 
     std::vector<double> testTimeseries;
