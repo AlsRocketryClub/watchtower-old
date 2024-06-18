@@ -11,15 +11,19 @@ Sonderborg, Denmark
 */
 
 // Path: src/main.cpp
-// #include UI layer written in Python
-#include "communication_layer.h"
-#include "test_functions.h"
 
 int main() {
-	// Initialize UI and communication
-	// ...
 
-	// Run event loop 
+	// Initialization
+
+	// Main loop
+	while (true) {
+		// Loop 
+	}
+
+	// Cleanup and exit
+	
+
 
 	return 0;
 }
