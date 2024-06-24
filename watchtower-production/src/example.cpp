@@ -1,5 +1,5 @@
-// test_functions.cpp
-#include "test_functions.h"
+// example.cpp
+#include "example.h"
 
 double add(double a, double b) {
 	return a + b;

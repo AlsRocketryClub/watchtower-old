@@ -49,5 +49,7 @@
         "thread": "cpp",
         "typeinfo": "cpp"
     },
-    "cmake.sourceDirectory": "/workspaces/watchtower/watchtower-prototype/ipc_tests"
+    "cmake.sourceDirectory": "D:/D drive Documents/GitHub/Code-Dei-Tech/Repos/arc-watchtower-hans/watchtower-production",
+    "cmake.buildDirectory": "${workspaceFolder}/watchtower-production/${buildType}",
+    "cmake.generator": "Visual Studio 17 2022"
 }
