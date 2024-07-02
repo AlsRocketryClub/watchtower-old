@@ -1,7 +1,7 @@
 /*
 -----------------------------------
 
-Header file for the main functions of the ground station
+Source code for the internal communication functions of the ground station
 
 Contributors: Arturo, Arkadiusz, Kyril, Hans
 The Als Rocketry Club
@@ -10,7 +10,8 @@ Sonderborg, Denmark
 -----------------------------------
 */
 
-#pragma once
+#include <iostream>
 
-// Process communiation function prototypes
-char processListen(char command);
+// MQTT or web socket communication?
+
+

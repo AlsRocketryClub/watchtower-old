@@ -11,25 +11,29 @@ Sonderborg, Denmark
 -----------------------------------
 */
 
-#include "CommandLayer.h"
+// Import header file and other libraries
+#include "pipeHandler.h"
 #include <iostream>
 #include <cstring>
 
-CommandLayer::CommandLayer() {
-    // Constructor implementation
+// Pipe handling methods -----------------------------------
+// Constructor
+PipeHandler::PipeHandler() {
 #ifdef _WIN32
     pipeName = L"\\\\.\\pipe\\WatchtowerPipe";
 #else
-    pipePath = "/tmp/watchtower_pipe";
+    pipePath = "/tmp/WatchtowerPipe";
 #endif
     createPipe();
 }
 
-CommandLayer::~CommandLayer() {
+// Destructor
+PipeHandler::~PipeHandler() {
     closePipe();
 }
 
-void CommandLayer::createPipe() {
+// Create the pipe
+void PipeHandler::createPipe() {
 #ifdef _WIN32
     pipe = CreateNamedPipe(
         pipeName,           // Pipe name
@@ -56,7 +60,8 @@ void CommandLayer::createPipe() {
 #endif
 }
 
-void CommandLayer::waitForClient() {
+// Wait for a client to connect
+void PipeHandler::waitForClient() {
 #ifdef _WIN32
     std::cout << "Waiting for client to connect..." << std::endl;
     BOOL connected = ConnectNamedPipe(pipe, NULL) ? TRUE : (GetLastError() == ERROR_PIPE_CONNECTED);
@@ -77,7 +82,8 @@ void CommandLayer::waitForClient() {
 #endif
 }
 
-void CommandLayer::sendMessage(const char* message) {
+// Send a message to the pipe
+void PipeHandler::sendMessage(const char* message) {
 #ifdef _WIN32
     HANDLE writeHandle = CreateFile(
         pipeName,           // Pipe name
@@ -107,7 +113,6 @@ void CommandLayer::sendMessage(const char* message) {
     } else {
         std::cout << "Message sent to client." << std::endl;
     }
-    CloseHandle(writeHandle);
 #else
     int write_fd = open(pipePath, O_WRONLY);
     if (write_fd == -1) {
@@ -122,6 +127,69 @@ void CommandLayer::sendMessage(const char* message) {
     } else {
         std::cout << "Message sent to client." << std::endl;
     }
-    close(write_fd);
+#endif
+    PipeHandler::closePipe();
+}
+
+// Receive a message from the pipe (edits the buffer variable in place)
+void PipeHandler::receiveMessage(char* buffer, unsigned int size) {
+#ifdef _WIN32
+    DWORD bytesRead;
+    BOOL success = ReadFile(
+        pipe,    // Pipe handle
+        buffer,  // Buffer to receive message
+        size,    // Size of buffer
+        &bytesRead, // Number of bytes read
+        NULL     // Not overlapped
+    );
+    if (!success) {
+        std::cerr << "Error reading from pipe." << std::endl;
+        exit(1);
+    }
+#else
+    ssize_t bytesRead = read(pipe_fd, buffer, size);
+    if (bytesRead == -1) {
+        std::cerr << "Error reading from pipe." << std::endl;
+        exit(1);
+    }
+#endif
+    std::cout << "Received message: " << buffer << std::endl;
+    PipeHandler::closePipe();
+}
+
+// Close the pipe
+void PipeHandler::closePipe() {
+#ifdef _WIN32
+    CloseHandle(pipe);
+#else
+    close(pipe_fd);
+    unlink(pipePath);
 #endif
 }
+
+// Status return methods -----------------------------------
+// Check if the pipe is created
+bool PipeHandler::isPipeCreated() {
+#ifdef _WIN32
+    return pipe != INVALID_HANDLE_VALUE;
+#else
+    return pipe_fd >= 0;
+#endif
+}
+
+// Get the read handle
+auto PipeHandler::getReadHandle() {
+#ifdef _WIN32
+    return pipe;
+#else  
+    return read(pipePath, O_RDONLY);
+#endif
+}
+
+// Get the write handle
+auto PipeHandler::getWriteHandle() {
+#ifdef _WIN32
+    return pipe;
+#else
+    return open(pipePath, O_WRONLY);
+#endif

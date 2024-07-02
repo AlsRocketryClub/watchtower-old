@@ -14,7 +14,7 @@ Sonderborg, Denmark
 
 // Include header files for testing
 // #include "main.cpp" // bad idea
-#include "command_layer.h"
+#include "pipeHandler.h"
 
 // Include standard libraries
 #include <iostream>
@@ -29,4 +29,24 @@ TEST(ProcessListenTest, RespondstoCommandX) {
     //EXPECT_EQ('Y', result); // Check alphanumeric input
     //ASSERT_TRUE(true);
     //EXPECT_EQ(3, add(1, 2));
+}
+
+TEST(PipeSetupTest, CreatesPipe) {
+    // Setup: Create a pipe for inter-process communication
+    PipeHandler pipeHandler;
+
+    // Assert: Check if the pipe is created successfully
+    ASSERT_TRUE(pipeHandler.isPipeCreated());
+
+    // Assert: Pipe handle validity
+    auto readHandle = pipeHandler.getReadHandle();
+    auto writeHandle = pipeHandler.getWriteHandle();
+
+    #ifdef _WIN32 // Windows
+    ASSERT_NE(readHandle, INVALID_HANDLE_VALUE);
+    ASSERT_NE(writeHandle, INVALID_HANDLE_VALUE);
+    #else // Unix/Linux
+    ASSERT_TRUE(readHandle >= 0);
+    ASSERT_TRUE(writeHandle >= 0);
+    #endif
 }

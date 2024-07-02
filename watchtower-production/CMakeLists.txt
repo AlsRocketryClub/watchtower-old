@@ -20,7 +20,7 @@ include(CTest) # Enable testing and create configuration file
 #enable_testing() # Deprecated due to CTest inclusion
 
 # Add the various subdirectories
-add_subdirectory(src)
+add_subdirectory(cpp_src)
 add_subdirectory(test)
 
 # Assume that your test executable is named 'test_example'

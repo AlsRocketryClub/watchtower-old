@@ -86,7 +86,9 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "queue": "cpp",
+        "ranges": "cpp"
     },
     "cmake.sourceDirectory": "D:/D drive Documents/GitHub/Code-Dei-Tech/Repos/arc-watchtower-hans/watchtower-production",
     "cmake.buildDirectory": "${workspaceFolder}/watchtower-production/${buildType}",

@@ -13,8 +13,8 @@ Sonderborg, Denmark
 
 #pragma once
 
-#ifndef COMMAND_LAYER_H
-#define COMMAND_LAYER_H
+#ifndef PIPE_HANDLER_H
+#define PIPE_HANDLER_H
 
 #ifdef _WIN32
 #include <windows.h>
@@ -27,16 +27,22 @@ Sonderborg, Denmark
 
 #include <string>
 
-class CommandLayer {
+class PipeHandler {
 public:
-    CommandLayer(); // Constructor
-    ~CommandLayer(); // Destructor
+    PipeHandler(); // Constructor
+    ~PipeHandler(); // Destructor
 
+    // Pipe handling methods
     void createPipe(); // Create the pipe
     void waitForClient(); // Wait for a client to connect
     void sendMessage(const char* message); // Send a message to the pipe
     void receiveMessage(char* buffer, unsigned int size); // Receive a message 
     void closePipe(); // Close the pipe
+
+    // Status return methods
+    bool isPipeCreated(); // Check if the pipe is created
+    auto getReadHandle(); // Get the read handle
+    auto getWriteHandle(); // Get the write handle
 
 private:
     #ifdef _WIN32
@@ -48,4 +54,4 @@ private:
     #endif
 };
 
-#endif // COMMAND_LAYER_H
+#endif // PIPE_HANDLER_H
