@@ -13,12 +13,14 @@ Sonderborg, Denmark
 // Path: cpp_src/main.cpp
 
 // Import header files
-#include "threadHandler.h" // Inter-process communication via pipe
+#include "threadHandler.h" // Threading functions
 
 // Import libraries
 
 
 // Declare global variables
+// (Refactor into a configuration file)
+int internalCommunicationProtocol = 0; // 0 for MQTT (default), 1 for TCP/IP
 
 // Instantiate objects
 
@@ -26,7 +28,7 @@ Sonderborg, Denmark
 void setup()
 {
 	// Configure the ground station here
-	threadHandler::startThreads();
+	threadHandler::startThreads(internalCommunicationProtocol);
 }
 
 // Main loop

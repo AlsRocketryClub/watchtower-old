@@ -21,7 +21,13 @@ include(CTest) # Enable testing and create configuration file
 
 # Add the various subdirectories
 add_subdirectory(cpp_src)
-add_subdirectory(test)
+#add_subdirectory(test)
 
 # Assume that your test executable is named 'test_example'
 # add_test(NAME example_test COMMAND test_example) # Deprecated due to gtest_discover_tests
+
+# Include directories for the program libraries
+#include_directories(${CMAKE_SOURCE_DIR}/include)
+
+# Add an executable for the main program
+#add_executable(Watchtower cpp_src/main.cpp)

@@ -20,11 +20,16 @@ Sonderborg, Denmark
 
 // Declare functions and any external variables
 namespace threadHandler {
-    void startThreads();
+    // Function declarations
+    void startThreads(int protocolType);
     void stopThreads();
-    extern std::mutex mtx;
-    extern std::condition_variable cv;
-    extern std::queue<std::string> messages;
+    void pushMessage(std::string& message);
+    std::string popMessage();
+
+    // External variables
+    extern std::mutex mtx; // Mutex for protecting the message queue
+    extern std::condition_variable cv; // Condition for notifying threads
+    extern std::queue<std::string> messages; // Queue for storing messages
 }
 
 #endif // THREAD_HANDLER_H

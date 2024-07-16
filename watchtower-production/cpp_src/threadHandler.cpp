@@ -1,7 +1,7 @@
 /*
 -----------------------------------
 
-Source code for the threading functions of the ground station
+Source file for the threading functions of the ground station
 
 Contributors: Arturo, Arkadiusz, Kyril, Hans
 The Als Rocketry Club
@@ -14,57 +14,75 @@ Sonderborg, Denmark
 #include <iostream>
 #include <thread>
 
-// Define global variables
-std::mutex threadHandler::mtx;
-std::condition_variable threadHandler::cv;
-std::queue<std::string> threadHandler::messages;
+// Define the global variables -----------------------------------
+std::mutex threadHandler::mtx; // Mutex for protecting the message queue
+std::condition_variable threadHandler::cv; // Condition for notifying threads
+std::queue<std::string> threadHandler::messageQueue; // Queue for storing messages
 
-namespace threadHandler{
-    bool finished = false; // Flag to indicate when the threads should stop
+// Implement the ThreadClass functions -----------------------------------
+// Thread constructor
+ThreadClass::ThreadClass(
+    std::string name,
+    std::mutex& mtx,
+    std::condition_variable& cv
+    ) : name(name), mtx(mtx), cv(cv), running(false) {}
 
-    void inputThread() {
-        std::string input;
-        while (true) {
-            std::getline(std::cin, input);
-            if (input == "exit") {
-                finished = true;
-                cv.notify_one();
-                break;
-            }
-            {
-                std::lock_guard<std::mutex> locker(mtx);
-                messages.push(input); // Protected code block {}
-            } // Guard goes out of scope and mtx is released
-            cv.notify_one();
-        }
-    }
-
-    void statusThread() {
-        while (!finished) {
-            std::unique_lock<std::mutex> locker(mtx);
-            cv.wait(locker, [] { return !messages.empty() || finished;});
-            while (!messages.empty()) {
-                std::cout << "Received: " << messages.front() << std::endl;
-                messages.pop();
-            }
-
-            locker.unlock();
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            std::cout << "Status thread running..." << std::endl;
-        }
-    } 
-
-    void startThreads() {
-        std::thread input(inputThread);
-        std::thread status(statusThread);
-
-        input.join();
-        status.join();
-    }
-
-    void stopThreads() {
-        // Implement if needed, for a graceful shutdown 
-        finished = true;
-        cv.notify_all();
-    }
+// Thread destructor
+ThreadClass::~ThreadClass() {
+    if (th.joinable()) {th.join();}
 }
+
+// Start the thread
+void ThreadClass::start() {
+    th = std::thread(&ThreadClass::run, this);
+
+    // If there is no error, set the running flag to true
+    if (th.joinable()) {running = true;}
+}
+
+// Stop the thread
+void ThreadClass::stop() {
+    if (th.joinable()) {th.join();}
+    running = false;
+}
+
+// Check if the thread is running
+bool ThreadClass::isRunning() {
+    return running;
+}
+
+// Implement the CommunicationThread functions --------------------------------
+// Constructor
+CommunicationThread::CommunicationThread(
+    std::string name,
+    std::mutex& mtx,
+    std::condition_variable& cv,
+    std::queue<std::string>& messageQueue
+    ) : ThreadClass(name, mtx, cv), messageQueue(messageQueue) {}
+
+// Push a message to the queue
+void CommunicationThread::pushMessage(std::string& message) {
+    std::lock_guard<std::mutex> locker(mtx);
+    messageQueue.push(message);
+    cv.notify_one();
+}
+
+// Pop a message from the queue
+std::string CommunicationThread::popMessage() {
+    std::string message;
+    std::lock_guard<std::mutex> locker(mtx);
+    if (!messageQueue.empty()) {
+        message = messageQueue.front();
+        messageQueue.pop();
+    }
+    return message;
+}
+
+// Implement the CommandReceiverThread functions --------------------------------
+// Constructor
+CommandReceiverThread::CommandReceiverThread(
+    std::string name,
+    std::mutex& mtx,
+    std::condition_variable& cv,
+    std::queue<std::string>& messageQueue
+    ) : CommunicationThread(name, mtx, cv, messageQueue) {}
