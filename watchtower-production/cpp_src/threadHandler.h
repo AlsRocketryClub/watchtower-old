@@ -17,25 +17,30 @@ Sonderborg, Denmark
 #include "communicationLayer.h" // Communication layer functions
 
 // Include C++ libraries
+#include <atomic>
+#include <memory>
 #include <string>
 #include <vector>
+#include <thread>
+#include <functional>
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 
-// External variables
+// Define the global variables -----------------------------------
+// Declare type aliases
+using StringQueue = std::queue<std::string>; // Queue of strings
+
+// Define the static variables
 namespace threadHandler {
     // Mutexes
     extern std::mutex commandMtx; // Mutex for the command queue
-    extern std::mutex telemetryMtx; // Mutex for the telemetry queue
-    extern std::condition_variable cv; // Condition for notifying threads
+    extern std::condition_variable commandCv; // Command condition variable
 
-    // Ring buffers
-    extern std::queue<std::string> commandBuffer; // Ring buffer for commands
-    extern std::vector<telemetryPacket> telemetryBuffer; // Ring buffer for telemetry
+    //extern std::mutex telemetryMtx; // Mutex for the telemetry queue
 }
 
-// Superclass for thread handling
+// Superclass for thread handling -----------------------------------
 class ThreadClass {
 protected:
     std::string name; // Name of the thread
@@ -44,7 +49,7 @@ protected:
     std::mutex& mtx; // Mutex for protecting variables
     std::condition_variable& cv; // Condition for notifying threads
 
-    bool running; // Flag if the thread is running
+    std::atomic<bool> running; // Thread-safe shutdown flag
 
 public:
     ThreadClass(
@@ -59,39 +64,88 @@ public:
     virtual void run() = 0; // Pure virtual function
 };
 
-// Intermediate class for handling communications
-class CommunicationThread : public ThreadClass {
-protected:
-    std::queue<std::string>& messageQueue; // Queue for storing messages
+// Subclass for listening to commands -----------------------------------
+// Instantiate listeners for each unique port (protocol or terminal) connected
+//   to the same mtx, cv and commandBuffer
+// Includes message queue, setup, run and shutdown functions
+class ListenerThread : public ThreadClass {
+private:
+    // Attributes
+    StringQueue& commandBuffer; // Reference to the command buffer
+    //int portType; // Communication port type
+    bool isConnected = false; // Flag if the port is connected
+
+    // Function pointer types
+    typedef void (*SetupFunctionType)();
+    typedef void (*RunFunctionType)(StringQueue&);
+    typedef void (*ShutdownFunctionType)();
+
+    // Function pointers
+    SetupFunctionType setupFunction = nullptr; // Function pointer for port setup
+    RunFunctionType runFunction = nullptr; // Function pointer for run
+    ShutdownFunctionType shutdownFunction = nullptr; // Function pointer for shutdown
+
+    //std::function<void()> setupFunction; // Function pointer for port setup
+    //std::function<void(StringQueue&)> runFunction; // Function pointer for run
+    //std::function<void()> shutdownFunction; // Function pointer for shutdown
+
+    // Private methods
+    void run(); // Main run function, to be privately called via start()
 
 public:
-    CommunicationThread(
+    ListenerThread( // Constructor
         std::string name,
         std::mutex& mtx,
         std::condition_variable& cv,
-        std::queue<std::string>& messageQueue
-        ); // Constructor 
-    void pushMessage(std::string& message); // Push a message to the queue
-    std::string popMessage(); // Pop a message from the queue
+        std::queue<std::string>& buffer, //int portType,
+        SetupFunctionType setupFunction,
+        RunFunctionType runFunction,
+        ShutdownFunctionType shutdownFunction
+        ); 
+    ~ListenerThread(); // Destructor
+    void setup(); // Setup the listener
+    void shutdown(); // Shutdown the listener
 };
 
-// Subclass for receiving commands
-class CommandReceiverThread : public CommunicationThread {
-public:
-    CommandReceiverThread(
+// Subclass for listening to telemetry -----------------------------------
+
+// Subclass for reporting statuses -----------------------------------
+
+// Subclass for sending telemetry commands -----------------------------------
+
+// Subclass for processing commands (Thread-safe Singleton pattern) ----------
+class CommandProcessor : public ThreadClass {
+private:
+    // Singleton instance
+    static std::unique_ptr<CommandProcessor> instance;
+    static std::once_flag onceFlag;
+
+    // Attributes
+    std::queue<std::string>& commandBuffer; // Reference to the command buffer
+
+    // Private constructor
+    CommandProcessor( // Constructor
         std::string name,
         std::mutex& mtx,
         std::condition_variable& cv,
-        std::queue<std::string>& messageQueue
-        ); // Constructor 
-    void run(); // Implementation of the pure virtual function
-};
+        std::queue<std::string>& commandBuffer
+        );
 
-// Subclass for receiving telemetry
-class TelemetryReceiverThread : public CommunicationThread {
+    // Private methods
+    void run(); // Main run function, to be privately called via start()
+
+    // Deleted copy constructor and assignment operator
+    CommandProcessor(const CommandProcessor&) = delete;
+    CommandProcessor& operator=(const CommandProcessor&) = delete;
+
 public:
-    TelemetryReceiverThread(int protocolType); // Constructor with protocol type
-    void run(); // Implementation of the pure virtual function
+    // Public method to get the instance
+    static CommandProcessor* getInstance(
+        std::string name,
+        std::mutex& mtx,
+        std::condition_variable& cv,
+        std::queue<std::string>& commandBuffer
+        );
 };
 
 #endif // THREAD_HANDLER_H

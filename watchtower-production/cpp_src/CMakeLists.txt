@@ -7,7 +7,7 @@
 #)
 
 # Create executable
-add_executable(WatchtowerProgram main.cpp threadHandler.cpp)
+add_executable(WatchtowerProgram main.cpp threadHandler.cpp communicationLayer.cpp)
 
 # Specify include directories for the library-
 #include_directories(${CMAKE_SOURCE_DIR}/include)

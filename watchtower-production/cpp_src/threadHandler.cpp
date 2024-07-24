@@ -11,13 +11,18 @@ Sonderborg, Denmark
 */
 
 #include "threadHandler.h"
+#include "communicationLayer.h"
 #include <iostream>
 #include <thread>
+#include <atomic>
 
 // Define the global variables -----------------------------------
-std::mutex threadHandler::mtx; // Mutex for protecting the message queue
-std::condition_variable threadHandler::cv; // Condition for notifying threads
-std::queue<std::string> threadHandler::messageQueue; // Queue for storing messages
+// Declare type aliases
+using StringQueue = std::queue<std::string>; // Queue of strings
+
+// Define the static variables
+std::mutex threadHandler::commandMtx; // Mutex for protecting the command queue
+std::condition_variable threadHandler::commandCv; // Command condition variable
 
 // Implement the ThreadClass functions -----------------------------------
 // Thread constructor
@@ -35,15 +40,12 @@ ThreadClass::~ThreadClass() {
 // Start the thread
 void ThreadClass::start() {
     th = std::thread(&ThreadClass::run, this);
-
-    // If there is no error, set the running flag to true
-    if (th.joinable()) {running = true;}
 }
 
 // Stop the thread
 void ThreadClass::stop() {
     if (th.joinable()) {th.join();}
-    running = false;
+    running.store(false);
 }
 
 // Check if the thread is running
@@ -51,38 +53,95 @@ bool ThreadClass::isRunning() {
     return running;
 }
 
-// Implement the CommunicationThread functions --------------------------------
+// Implement the ListenerThread functions --------------------------------
 // Constructor
-CommunicationThread::CommunicationThread(
+ListenerThread::ListenerThread(
     std::string name,
     std::mutex& mtx,
     std::condition_variable& cv,
-    std::queue<std::string>& messageQueue
-    ) : ThreadClass(name, mtx, cv), messageQueue(messageQueue) {}
-
-// Push a message to the queue
-void CommunicationThread::pushMessage(std::string& message) {
-    std::lock_guard<std::mutex> locker(mtx);
-    messageQueue.push(message);
-    cv.notify_one();
-}
-
-// Pop a message from the queue
-std::string CommunicationThread::popMessage() {
-    std::string message;
-    std::lock_guard<std::mutex> locker(mtx);
-    if (!messageQueue.empty()) {
-        message = messageQueue.front();
-        messageQueue.pop();
+    std::queue<std::string>& buffer, //int portTypeArg
+    SetupFunctionType setupFunction,
+    RunFunctionType runFunction,
+    ShutdownFunctionType shutdownFunction
+    ) : ThreadClass(name, mtx, cv), 
+        commandBuffer(buffer), //portType(portTypeArg),
+        setupFunction(setupFunction), runFunction(runFunction), 
+        shutdownFunction(shutdownFunction) {
+        // Set the running flag
+        running.store(true);
     }
-    return message;
+
+// Destructor
+ListenerThread::~ListenerThread() {
+    // Shut down the communication port if applicable
+    if (isConnected) {shutdownFunction();}
 }
 
-// Implement the CommandReceiverThread functions --------------------------------
-// Constructor
-CommandReceiverThread::CommandReceiverThread(
+// Setup the listener
+void ListenerThread::setup() {
+    // Implement the setup procedure for the communication port
+    setupFunction();
+    isConnected = true;
+}
+
+// Run the listener (called by ThreadClass::start())
+void ListenerThread::run() {
+    // Setup the listener
+    setup();
+
+    // Run the listener
+    while (running.load()) {
+        runFunction(commandBuffer);
+    }
+
+    // Shutdown the listener after the loop
+    shutdownFunction();
+    isConnected = false;
+}
+
+// Shutdown the listener
+void ListenerThread::shutdown() {
+    // Set the flag for shutdown
+    running.store(false);
+}
+
+// Implement the CommandProcessor functions --------------------------------
+// Private constructor
+CommandProcessor::CommandProcessor(
     std::string name,
     std::mutex& mtx,
     std::condition_variable& cv,
-    std::queue<std::string>& messageQueue
-    ) : CommunicationThread(name, mtx, cv, messageQueue) {}
+    std::queue<std::string>& commandBuffer
+    ) : ThreadClass(name, threadHandler::commandMtx, threadHandler::commandCv), 
+                    commandBuffer(commandBuffer) {}
+
+// Get the singleton instance
+CommandProcessor* CommandProcessor::getInstance(
+    std::string name,
+    std::mutex& mtx,
+    std::condition_variable& cv,
+    std::queue<std::string>& commandBuffer
+    ) {
+    std::call_once(onceFlag, [&] { // Thread-safe call once
+        instance.reset(new CommandProcessor(name, mtx, cv, commandBuffer));
+    });
+    return instance.get();
+}
+
+// Initialize the singleton instance
+std::unique_ptr<CommandProcessor> CommandProcessor::instance = nullptr;
+std::once_flag CommandProcessor::onceFlag;
+
+// Run the command processor (called by ThreadClass::start())
+void CommandProcessor::run() {
+    // Run the command processor
+    while (running.load()) {
+        // Process the command buffer
+        std::unique_lock<std::mutex> lck(mtx);
+        cv.wait(lck, [&] {return !commandBuffer.empty();});
+        std::string command = commandBuffer.front();
+        commandBuffer.pop();
+        lck.unlock();
+        std::cout << "Processing command: " << command << std::endl;
+    }
+}
