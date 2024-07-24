@@ -22,7 +22,7 @@ Sonderborg, Denmark
 #include <string>
 #include <vector>
 #include <thread>
-#include <functional>
+// #include <functional>
 #include <queue>
 #include <mutex>
 #include <condition_variable>
@@ -77,7 +77,7 @@ private:
 
     // Function pointer types
     typedef void (*SetupFunctionType)();
-    typedef void (*RunFunctionType)(StringQueue&);
+    typedef std::string (*RunFunctionType)();
     typedef void (*ShutdownFunctionType)();
 
     // Function pointers
@@ -109,8 +109,6 @@ public:
 
 // Subclass for listening to telemetry -----------------------------------
 
-// Subclass for reporting statuses -----------------------------------
-
 // Subclass for sending telemetry commands -----------------------------------
 
 // Subclass for processing commands (Thread-safe Singleton pattern) ----------
@@ -130,6 +128,7 @@ private:
         std::condition_variable& cv,
         std::queue<std::string>& commandBuffer
         );
+    
 
     // Private methods
     void run(); // Main run function, to be privately called via start()
@@ -139,6 +138,9 @@ private:
     CommandProcessor& operator=(const CommandProcessor&) = delete;
 
 public:
+    // Destructor
+    ~CommandProcessor();
+
     // Public method to get the instance
     static CommandProcessor* getInstance(
         std::string name,
@@ -147,5 +149,63 @@ public:
         std::queue<std::string>& commandBuffer
         );
 };
+
+// Subclass for reporting statuses (Thread-safe Singleton pattern) ----------
+class StatusReporter : public ThreadClass {
+private:
+    // Singleton instance
+    static std::unique_ptr<StatusReporter> instance;
+    static std::once_flag onceFlag;
+
+    // Attributes
+    std::queue<std::string>& statusBuffer; // Reference to the status buffer
+
+    // Private constructor
+    StatusReporter( // Constructor
+        std::string name,
+        std::mutex& mtx,
+        std::condition_variable& cv,
+        std::queue<std::string>& statusBuffer
+        );
+
+    // Private methods
+    void run(); // Main run function, to be privately called via start()
+
+    // Deleted copy constructor and assignment operator
+    StatusReporter(const StatusReporter&) = delete;
+    StatusReporter& operator=(const StatusReporter&) = delete;
+
+public:
+    // Destructor
+    ~StatusReporter();
+
+    // Public method to get the instance
+    static StatusReporter* getInstance(
+        std::string name,
+        std::mutex& mtx,
+        std::condition_variable& cv,
+        std::queue<std::string>& statusBuffer
+        );
+};
+
+// Subclass for actuator control -----------------------------------
+class ActuatorController : public ThreadClass {
+private:
+    // Attributes
+    std::atomic<float> targetValue; // Thread-safe target value for the actuator control
+    
+    // Private methods
+    void run(); // Main run function, to be privately called via start()
+
+public:
+    ActuatorController( // Constructor
+        std::string name,
+        std::mutex& mtx,
+        std::condition_variable& cv
+        );
+    ~ActuatorController(); // Destructor
+    void setTargetValue(float value); // Set the target value
+};
+
 
 #endif // THREAD_HANDLER_H

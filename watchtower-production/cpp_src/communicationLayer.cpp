@@ -52,17 +52,14 @@ StringQueue statusBuffer; // Ring buffer for status
 //}
 
 // Wait for user input
-std::function<void(StringQueue&)> communicationLayer::getMessageTerminal(StringQueue& buffer) {
-    return [](StringQueue& buffer) {
-        std::string message;
-        std::getline(std::cin, message);
-        buffer.push(message);
-    };
+std::string communicationLayer::getMessageTerminal() {
+    std::string message;
+    std::getline(std::cin, message);
+    //std::cout << "Message received: " << message << std::endl; // Debugging
+    return message;
 }
 
 // Write to cout
-std::function<void(std::string&)> communicationLayer::sendMessageTerminal() {
-    return [](std::string& message) {
-        std::cout << message << std::endl;
-    };
+void communicationLayer::sendMessageTerminal(std::string& message) {
+    std::cout << message << std::endl;
 }

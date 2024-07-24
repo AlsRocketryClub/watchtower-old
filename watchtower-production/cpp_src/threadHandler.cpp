@@ -91,7 +91,14 @@ void ListenerThread::run() {
 
     // Run the listener
     while (running.load()) {
-        runFunction(commandBuffer);
+        std::string command = runFunction(); // Get the command from the port
+        
+        // Push the command to the buffer
+        std::unique_lock<std::mutex> lck(mtx);
+        commandBuffer.push(command);
+        //std::cout << "Pushed command: " << command << std::endl; // Debugging
+        lck.unlock();
+        cv.notify_one();
     }
 
     // Shutdown the listener after the loop
@@ -111,9 +118,18 @@ CommandProcessor::CommandProcessor(
     std::string name,
     std::mutex& mtx,
     std::condition_variable& cv,
-    std::queue<std::string>& commandBuffer
+    std::queue<std::string>& buffer
     ) : ThreadClass(name, threadHandler::commandMtx, threadHandler::commandCv), 
-                    commandBuffer(commandBuffer) {}
+                    commandBuffer(buffer) {
+    // Set the running flag
+    running.store(true);
+}
+
+// Destructor
+CommandProcessor::~CommandProcessor() {
+    // Stop the command processor
+    stop();
+}
 
 // Get the singleton instance
 CommandProcessor* CommandProcessor::getInstance(
@@ -137,6 +153,7 @@ void CommandProcessor::run() {
     // Run the command processor
     while (running.load()) {
         // Process the command buffer
+        std::cout << "Waiting for command..." << std::endl;
         std::unique_lock<std::mutex> lck(mtx);
         cv.wait(lck, [&] {return !commandBuffer.empty();});
         std::string command = commandBuffer.front();
