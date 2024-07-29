@@ -162,3 +162,33 @@ void CommandProcessor::run() {
         std::cout << "Processing command: " << command << std::endl;
     }
 }
+
+// Implement the ActuatorController functions --------------------------------
+// // Constructor
+// ActuatorController::ActuatorController(
+//     std::string name,
+//     std::mutex& mtx,
+//     std::condition_variable& cv
+//     ) : ThreadClass(name, mtx, cv) {
+//     // Set the running flag
+//     running.store(true);
+// }
+
+// // Destructor
+// ActuatorController::~ActuatorController() {
+//     // Stop the actuator controller
+//     stop();
+// }
+
+// // Run the actuator controller (called by ThreadClass::start())
+// void ActuatorController::run() {
+//     // Run the actuator controller
+//     while (running.load()) {
+//         // Implement the actuator control logic
+//         std::cout << "Actuator controller running..." << std::endl;
+//         std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        
+//     }
+// }
+

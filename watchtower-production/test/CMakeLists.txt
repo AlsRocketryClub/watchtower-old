@@ -1,7 +1,7 @@
 # test/CMakeLists.txt
 # Include directories
 include_directories(${PROJECT_SOURCE_DIR}/include)
-#include_directories(${PROJECT_SOURCE_DIR}/cpp_src)
+#include_directories(${PROJECT_SOURCE_DIR}/compute_src)
 
 # Add test files
 #add_executable(test_example test_example.cpp)

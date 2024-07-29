@@ -14,6 +14,7 @@ Sonderborg, Denmark
 #define THREAD_HANDLER_H
 
 // Include user libraries
+#include "watchtowerThreadingUtils.h" // High-level classes
 #include "communicationLayer.h" // Communication layer functions
 
 // Include C++ libraries
@@ -30,45 +31,27 @@ Sonderborg, Denmark
 // Define the global variables -----------------------------------
 // Declare type aliases
 using StringQueue = std::queue<std::string>; // Queue of strings
+using FloatQueue = std::queue<float>; // Queue of floats
 
 // Define the static variables
 namespace threadHandler {
-    // Mutexes
+    // Communication variables
     extern std::mutex commandMtx; // Mutex for the command queue
     extern std::condition_variable commandCv; // Command condition variable
 
     //extern std::mutex telemetryMtx; // Mutex for the telemetry queue
+
+    // Actuator variables
+    extern std::mutex azimuthMtx; // Mutex for azimuth motor control
+    extern std::mutex elevationMtx; // Mutex for elevation motor control
+    extern std::condition_variable actuatorCv; // Actuator condition variable
 }
-
-// Superclass for thread handling -----------------------------------
-class ThreadClass {
-protected:
-    std::string name; // Name of the thread
-
-    std::thread th; // Thread object
-    std::mutex& mtx; // Mutex for protecting variables
-    std::condition_variable& cv; // Condition for notifying threads
-
-    std::atomic<bool> running; // Thread-safe shutdown flag
-
-public:
-    ThreadClass(
-        std::string name,
-        std::mutex& mtx,
-        std::condition_variable& cv
-        ); // Constructor
-    virtual ~ThreadClass(); // Destructor
-    void start(); // Start the thread
-    void stop(); // Stop the thread
-    bool isRunning(); // Check if the thread is running
-    virtual void run() = 0; // Pure virtual function
-};
 
 // Subclass for listening to commands -----------------------------------
 // Instantiate listeners for each unique port (protocol or terminal) connected
 //   to the same mtx, cv and commandBuffer
 // Includes message queue, setup, run and shutdown functions
-class ListenerThread : public ThreadClass {
+class ListenerThread : public watchtower::Thread {
 private:
     // Attributes
     StringQueue& commandBuffer; // Reference to the command buffer
@@ -112,7 +95,7 @@ public:
 // Subclass for sending telemetry commands -----------------------------------
 
 // Subclass for processing commands (Thread-safe Singleton pattern) ----------
-class CommandProcessor : public ThreadClass {
+class CommandProcessor : public watchtower::Thread {
 private:
     // Singleton instance
     static std::unique_ptr<CommandProcessor> instance;
@@ -151,7 +134,7 @@ public:
 };
 
 // Subclass for reporting statuses (Thread-safe Singleton pattern) ----------
-class StatusReporter : public ThreadClass {
+class StatusReporter : public watchtower::Thread {
 private:
     // Singleton instance
     static std::unique_ptr<StatusReporter> instance;
@@ -188,24 +171,56 @@ public:
         );
 };
 
-// Subclass for actuator control -----------------------------------
-class ActuatorController : public ThreadClass {
-private:
-    // Attributes
-    std::atomic<float> targetValue; // Thread-safe target value for the actuator control
-    
-    // Private methods
-    void run(); // Main run function, to be privately called via start()
+// Subclass for rocket tracking -----------------------------------
+// class RocketTracker : public ThreadClass {
+// private:
+//     // Attributes
+//     std::atomic<float> azimuthAngle; // Thread-safe azimuth angle of the rocket
+//     std::atomic<float> elevationAngle; // Thread-safe elevation angle of the rocket
+//     std::vector<float>& azimuthAngleBuffer; // Buffer for target angle values
+//     std::vector<float>& elevationAngleBuffer; // Buffer for target angle values
 
-public:
-    ActuatorController( // Constructor
-        std::string name,
-        std::mutex& mtx,
-        std::condition_variable& cv
-        );
-    ~ActuatorController(); // Destructor
-    void setTargetValue(float value); // Set the target value
-};
+//     // Private methods
+//     void run(); // Main run function, to be privately called via start()
+
+// // Subclass for actuator handling -----------------------------------
+// class ActuatorHandler : public ThreadClass {
+// private:
+//     // Attributes
+//     std::string motorName; // Name of the antenna motor
+//     std::vector<float>& targetAngleBuffer; // Buffer for target angle values
+
+//     // Private methods
+//     void run(); // Main run function, to be privately called via start()
+
+// public:
+//     ActuatorHandler( // Constructor
+//         std::string threadName,
+//         std::string motorName,
+//         std::mutex& mtx,
+//         std::condition_variable& cv
+//         );
+//     ~ActuatorHandler(); // Destructor
+// };
+
+// // Subclass for actuator control -----------------------------------
+// class ActuatorController : public ThreadClass {
+// private:
+//     // Attributes
+//     std::atomic<float> targetValue; // Thread-safe target value for the actuator control
+    
+//     // Private methods
+//     void run(); // Main run function, to be privately called via start()
+
+// public:
+//     ActuatorController( // Constructor
+//         std::string name,
+//         std::mutex& mtx,
+//         std::condition_variable& cv
+//         );
+//     ~ActuatorController(); // Destructor
+//     void setTargetValue(float value); // Set the target value
+// };
 
 
 #endif // THREAD_HANDLER_H

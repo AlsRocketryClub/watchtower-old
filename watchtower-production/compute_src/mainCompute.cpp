@@ -1,7 +1,7 @@
 /*
 -----------------------------------
 
-Source code for the main functions of the ground station
+Source code for the main backend functions of the ground station
 
 Contributors: Arturo, Arkadiusz, Kyril, Hans
 The Als Rocketry Club
@@ -22,7 +22,7 @@ Sonderborg, Denmark
 #include <chrono> // Time library
 
 // Declare global variables -----------------------------------
-// Blank functions for threadHandler
+// Blank functions
 void emptyFunction() {}
 
 // (Refactor into a configuration file)
@@ -47,6 +47,8 @@ CommandProcessor* commandProcessor = CommandProcessor::getInstance(
 ); 
 
 // Status reporter object (Singleton)
+
+// Actuator control object
 
 // Initialization routine -----------------------------------
 void setup()

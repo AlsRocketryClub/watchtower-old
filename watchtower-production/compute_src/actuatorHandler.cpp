@@ -9,3 +9,12 @@ Sonderborg, Denmark
 
 -----------------------------------
 */
+
+// Include header file
+#include "actuatorHandler.h"
+
+// Include C++ libraries
+
+// Define the global variables -----------------------------------
+
+// Implement functions -----------------------------------
