@@ -38,15 +38,16 @@ namespace watchtower {
     using TelemetryVector = std::vector<telemetryPacket>; // Vector of telemetry packets
 
     // Terminal-based communication utilities -----------------------------------
+    // NOT RECOMMENDED DUE TO BLOCKING READING - Use for debugging only
     // Get a message from the terminal
-    std::string getMessageTerminal() { 
+    std::string getMessageTerminal() {
         std::string message;
         std::getline(std::cin, message);
         return message;
     }
 
     // Send a message to the terminal
-    std::string sendMessageTerminal(std::string& message) { 
+    void sendMessageTerminal(std::string& message) { 
         std::cout << message << std::endl;
     }
 
@@ -57,7 +58,7 @@ namespace watchtower {
     }
 
     // Get a message from the MQTT communication
-    std::string getMessageMQTT() { 
+    void getMessageMQTT() { 
         // Wait for incoming messages
     }
     

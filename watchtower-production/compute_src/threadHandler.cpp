@@ -144,10 +144,6 @@ CommandProcessor* CommandProcessor::getInstance(
     return instance.get();
 }
 
-// Initialize the singleton instance
-std::unique_ptr<CommandProcessor> CommandProcessor::instance = nullptr;
-std::once_flag CommandProcessor::onceFlag;
-
 // Run the command processor (called by ThreadClass::start())
 void CommandProcessor::run() {
     // Run the command processor

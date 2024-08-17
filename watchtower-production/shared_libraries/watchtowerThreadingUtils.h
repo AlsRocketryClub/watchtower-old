@@ -31,11 +31,12 @@ namespace watchtower {
     typedef void (*SetupFunctionType)();
     typedef std::string (*RunFunctionType)();
     typedef void (*ShutdownFunctionType)();
+    // typedef void (*SendMessageFunctionType)(std::string);
 
     // Function pointers
-    SetupFunctionType setupFunction = nullptr; // Function pointer for port setup
-    RunFunctionType runFunction = nullptr; // Function pointer for run
-    ShutdownFunctionType shutdownFunction = nullptr; // Function pointer for shutdown
+    SetupFunctionType setupFunction = nullptr; // Function pointer for thread port setup
+    RunFunctionType runFunction = nullptr; // Function pointer for thread run
+    ShutdownFunctionType shutdownFunction = nullptr; // Function pointer for thread shutdown
 
     // Class for basic threading -----------------------------------
     class Thread {
@@ -64,8 +65,9 @@ namespace watchtower {
         }
 
         void stop() { // Stop the thread
-            if (th.joinable()) {th.join();}
+            //if (th.joinable()) {th.join();}
             running.store(false);
+            // Stop the thread
         }
 
         bool isRunning() { // Check if the thread is running
@@ -73,7 +75,7 @@ namespace watchtower {
         }
 
         virtual void run() = 0; // Virtual function for running the thread
-    };   
+    };
 
     // Class for singleton-based thread ------------------------
     class ThreadSingleton : public Thread {
@@ -83,21 +85,23 @@ namespace watchtower {
             std::mutex& mtx,
             std::condition_variable& cv
             ) : Thread(name, mtx, cv) {}
-    
+
         void run() override { // Run function virtual bypass, to be overridden
             assert(false && "run() should be overridden in further derived classes");
-        } 
+        }
 
     public:
-        ~ThreadSingleton() {} // Destructor
-
         static ThreadSingleton* getInstance( // Get the singleton instance
             std::string name,
             std::mutex& mtx,
             std::condition_variable& cv
             ) {
-            static ThreadSingleton instance(name, mtx, cv);
-            return &instance;
+            static std::unique_ptr<ThreadSingleton> instance; // Instance
+            static std::once_flag onceFlag; // Flag for singleton creation
+            std::call_once(onceFlag, [&] {
+                instance.reset(new ThreadSingleton(name, mtx, cv));
+            });
+            return instance.get();
         }
     };
 
@@ -109,26 +113,31 @@ namespace watchtower {
         RunFunctionType runFunction; // Run function
         ShutdownFunctionType shutdownFunction; // Shutdown function
 
+        //std::mutex& listenMtx = 
+        // Mutex for the listener thread
+        //std::condition_variable& listenCv; // Condition for the listener thread
+
         bool isConnected; // Connection status
 
     public:
         ListenerThread( // Constructor
-            std::string name,
-            std::mutex& mtx,
-            std::condition_variable& cv,
-            std::queue<std::string>& buffer,
+            std::string name, 
+            std::mutex& threadMtx, std::condition_variable& threadCv,
+            std::queue<std::string>& buffer, 
             SetupFunctionType setupFunction,
             RunFunctionType runFunction,
             ShutdownFunctionType shutdownFunction
-            ) : Thread(name, mtx, cv), 
-                bufferToPush(buffer),
+            ) : Thread(name, threadMtx, threadCv), bufferToPush(buffer),
                 setupFunction(setupFunction), runFunction(runFunction), 
                 shutdownFunction(shutdownFunction), isConnected(false) {
             running.store(true);
                 }
 
         ~ListenerThread() { // Destructor
-            if (isConnected) {shutdownFunction();}
+            if (isConnected && th.joinable()) {
+                shutdownFunction();
+                th.join();
+            }
         }
 
         void setup() { // Setup the listener
@@ -137,23 +146,71 @@ namespace watchtower {
         }
 
         void run() override { // Run the listener
-            setup();
-            while (running.load()) {
+            setup(); // Setup the listener
+            while (running.load()) { // While running
                 std::string command = runFunction();
-                
+
                 // Push the command to the buffer
-                std::unique_lock<std::mutex> lock(mtx);
-                bufferToPush.push(command);
-                lock.unlock();
-                cv.notify_one();
+                std::cout << "Received command: " << command << std::endl;
+                if (command != "") {
+                    std::unique_lock<std::mutex> lock(mtx);
+                    bufferToPush.push(command);
+                    lock.unlock();
+                    cv.notify_one();
+                }
             }
+            
+            std::cout << "Listener thread shutting down..." << std::endl;
+
+            if (th.joinable()) {
+                shutdownFunction();
+                th.join();
+            } // If running is false, join the thread
         }
     };
 
-    // Class for command processor thread -----------------------------------
-    //class CommandProcessor : public Thread, public Singleton {
+    // Class for status reporting thread ---------------------------
+    class StatusReporter : public Thread {
+    private:
+        SetupFunctionType setupFunction; // Setup function
+        RunFunctionType runFunction; // Run function
+        ShutdownFunctionType shutdownFunction; // Shutdown function
 
-    
+    public:
+        StatusReporter( // Constructor
+            std::string name, std::mutex& mtx, std::condition_variable& cv,
+            SetupFunctionType setupFunction,
+            RunFunctionType runFunction,
+            ShutdownFunctionType shutdownFunction
+            ) : Thread(name, mtx, cv),
+                setupFunction(setupFunction), runFunction(runFunction),
+                shutdownFunction(shutdownFunction) {
+            running.store(true);
+                }
+
+        ~StatusReporter() { // Destructor
+            if (th.joinable()) {
+                shutdownFunction();
+                th.join();
+            }
+        }
+
+        void setup() { // Setup the status reporter
+            setupFunction();
+        }
+
+        void run() override { // Run the status reporter
+            setup();
+            while (running.load()) {
+                runFunction();
+            }
+
+            if (th.joinable()) {
+                shutdownFunction();
+                th.join();
+            } // If running is false, join the thread
+        }
+    };
 }
 
 
