@@ -9,12 +9,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 # Force Google Test to use the shared runtime library
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+#set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 # Include the GoogleTest, CTest
-add_subdirectory(../modules/googletest googletest)
-include(GoogleTest) # Include GoogleTest
-include(CTest) # Enable testing and create configuration file
+#add_subdirectory(../modules/googletest googletest)
+#include(GoogleTest) # Include GoogleTest
+#include(CTest) # Enable testing and create configuration file
 include_directories(../modules/paho.mqtt.cpp/src)
 
 # Enable testing
@@ -36,6 +36,9 @@ include_directories(../modules/paho.mqtt.cpp/src)
 # add_executable( # Application that handles telemetry
 #     WatchtowerTelemetryProgram ${CMAKE_SOURCE_DIR}/telemetry_src/mainTelemetry.cpp
 # )
+add_executable( # Application that handles the console interface with the user
+    WatchtowerConsoleProgram ${CMAKE_SOURCE_DIR}/console_src/mainConsole.cpp
+)
 add_executable( # Application that handles the console interface with the user
     WatchtowerConsoleProgram ${CMAKE_SOURCE_DIR}/console_src/mainConsole.cpp
 )
