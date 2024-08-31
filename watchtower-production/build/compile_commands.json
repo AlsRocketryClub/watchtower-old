@@ -1,0 +1,8 @@
+[
+{
+  "directory": "D:/D drive Documents/GitHub/Code-Dei-Tech/Repos/arc-watchtower-hans/watchtower-production/build",
+  "command": "\"C:\\PROGRA~2\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Tools\\MSVC\\14.40.33807\\bin\\Hostx64\\x64\\cl.exe\"  /nologo /TP -I\"D:\\D drive Documents\\GitHub\\Code-Dei-Tech\\Repos\\arc-watchtower-hans\\watchtower-production\\include\" /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++17 /FoCMakeFiles\\WatchtowerProgram.dir\\src\\main.cpp.obj /FdCMakeFiles\\WatchtowerProgram.dir\\ /FS -c \"D:\\D drive Documents\\GitHub\\Code-Dei-Tech\\Repos\\arc-watchtower-hans\\watchtower-production\\src\\main.cpp\"",
+  "file": "D:\\D drive Documents\\GitHub\\Code-Dei-Tech\\Repos\\arc-watchtower-hans\\watchtower-production\\src\\main.cpp",
+  "output": "CMakeFiles\\WatchtowerProgram.dir\\src\\main.cpp.obj"
+}
+]

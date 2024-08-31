@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Watchtower",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "WatchtowerProgram::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-WatchtowerProgram-Debug-7989bb93f54fda803f19.json",
+					"name" : "WatchtowerProgram",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/D drive Documents/GitHub/Code-Dei-Tech/Repos/arc-watchtower-hans/watchtower-production/build",
+		"source" : "D:/D drive Documents/GitHub/Code-Dei-Tech/Repos/arc-watchtower-hans/watchtower-production"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}
