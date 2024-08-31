@@ -80,7 +80,7 @@ namespace watchtowerTelemetry {
 
         // Send status over IPC
         void reportStatus(std::string message) {
-            std::cout << "Status reported: " << status << std::endl;
+            std::cout << "Status reported: " << message << std::endl;
         }
     };
 }

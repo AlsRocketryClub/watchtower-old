@@ -30,7 +30,9 @@ void setup()
               << std::endl;
 
     // Set up threads
-    watchtowerTelemetry::initThreads();
+    // watchtowerTelemetry::initThreads();
+
+    
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
