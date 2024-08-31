@@ -7,3 +7,6 @@
 [submodule "modules/mosquitto"]
 	path = modules/mosquitto
 	url = https://github.com/eclipse/mosquitto.git
+[submodule "modules/paho.mqtt.c"]
+	path = modules/paho.mqtt.c
+	url = https://github.com/eclipse/paho.mqtt.c.git
