@@ -1,5 +1,4 @@
 # Instalation pigpiod
----
 ## Linux commands
 
 List of commands which must be runned in a row
