@@ -36,5 +36,5 @@ target_link_libraries(programm-name PUBLIC pigpio fmt)
 ## Links
 - [Official pigpio library website](https://abyz.me.uk/rpi/pigpio/index.html)
 - [Official github](https://github.com/joan2937/pigpio)
-- [List of fuctions](https://abyz.me.uk/rpi/pigpio/pdif2.html)
+- [List of fuctions](https://abyz.me.uk/rpi/pigpio/cif.html)
 - [YouTube Guide playlist](https://www.youtube.com/watch?v=R6VJE7WfXt8&list=PLf6OEfnTo5N4PXbw85heZ1q3ypCaSMOGo&pp=iAQB)
