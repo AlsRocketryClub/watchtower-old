@@ -27,6 +27,14 @@ class LoRaClass
     public:
         LoRaClass();
 
+        int begin();
+        void end();
+
+        void setFrequency(long frequency);
+        void setSpiChannel(unsigned int channel);
+        void setSpiFlags(unsigned int flags);
+        void setResetPin(int _resetPin);
+        void setDIO0Pin(int _dio0Pin);
 };
 
 
