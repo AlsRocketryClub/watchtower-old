@@ -6,6 +6,7 @@
 // ---------------------------------------------------- //
 
 #include "LoRa.h"
+#include <pigpio.h>
 
 // registers
 #define REG_FIFO                 0x00
@@ -89,6 +90,4 @@
 #define MAP_DIO3_LORA_NOP       0x03
 
 int LoRaClass::begin()
-{
-    
-}
+{}
