@@ -92,5 +92,26 @@
 int LoRaClass::begin()
 {
     int _gpioResult;
+
+    //set up reset pin 
     _gpioResult = gpioSetMode(LoRaClass::resetPin, PI_OUTPUT);
+    if(_gpioResult != 0)
+    {
+        return _gpioResult;
+    }
+
+    //perform reset
+    gpioWrite(LoRaClass::resetPin, PI_LOW);
+    gpioDelay(10000);
+    gpioWrite(LoRaClass::resetPin, PI_HIGH);
+    gpioDelay(10000);
+
+    int _spiResult;
+    _spiResult = spiOpen(LoRaClass::spiChannel, LoRaClass::spiFrequency, LoRaClass::spiFlags);
+    
+    if(_spiResult != 0)
+    {
+        return _spiResult;
+    }
+    
 }

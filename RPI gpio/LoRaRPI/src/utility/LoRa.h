@@ -20,7 +20,7 @@ class LoRaClass
     private:
         int resetPin = LORA_DEFAULT_RESET_PIN;
         int dio0Pin = LORA_DEFAULT_DIO0_PIN;
-        long frequency = LORA_DEFAULT_SPI_FREQUENCY;
+        long spiFrequency = LORA_DEFAULT_SPI_FREQUENCY;
         unsigned int spiFlags = LORA_DEFAULT_SPI_FLAGS;
         unsigned int spiChannel = LORA_DEFAULT_SPI_CHANNEL;
 
@@ -35,6 +35,9 @@ class LoRaClass
         void setSpiFlags(unsigned int flags);
         void setResetPin(int _resetPin);
         void setDIO0Pin(int _dio0Pin);
+
+        uint8_t readRegister(uint8_t address);
+        uint8_t singleTransfer(uint8_t address, uint8_t value);
 };
 
 
