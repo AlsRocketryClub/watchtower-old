@@ -90,4 +90,7 @@
 #define MAP_DIO3_LORA_NOP       0x03
 
 int LoRaClass::begin()
-{}
+{
+    int _gpioResult;
+    _gpioResult = gpioSetMode(LoRaClass::resetPin, PI_OUTPUT);
+}
