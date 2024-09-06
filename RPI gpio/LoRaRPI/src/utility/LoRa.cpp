@@ -105,23 +105,19 @@ int LoRaClass::begin()
     gpioDelay(10000);
     gpioWrite(LoRaClass::resetPin, PI_HIGH);
     gpioDelay(10000);
-
-    int _spiResult;
-    _spiResult = spiOpen(LoRaClass::spiChannel, LoRaClass::spiFrequency, LoRaClass::spiFlags);
-    
-    if(_spiResult != 0)
-    {
-        return _spiResult;
-    }
     
 }
 
 
-uint8_t LoRaClass::singleTransfer(uint8_t address, uint8_t value)
+int LoRaClass::singleTransfer(char *address, char *value, char *buf)
 {
-    uint8_t response;
-
-    
-
-    return response;
+    char response[2];
+    int _spiResult;
+    _spiResult = spiOpen(LoRaClass::spiChannel, LoRaClass::spiFrequency, LoRaClass::spiFlags);
+    spiWrite(_spiResult, address, 2);
+    spiWrite(_spiResult, value, 2);
+    spiRead(_spiResult, response, 2);
+    spiClose(_spiResult);
+    buf = response;
+    return 0;
 }
