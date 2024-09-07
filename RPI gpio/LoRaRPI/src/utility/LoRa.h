@@ -36,9 +36,9 @@ class LoRaClass
         void setResetPin(int _resetPin);
         void setDIO0Pin(int _dio0Pin);
 
-        uint8_t readRegister(uint8_t address);
+        int readRegister(char *address, char *buf);
         void writeRegister(uint8_t address, uint8_t value);
-        int singleTransfer(char *address, char *value, char *buf);
+        int singleTransfer(uint8_t address, uint8_t value, char *buf);
 };
 
 

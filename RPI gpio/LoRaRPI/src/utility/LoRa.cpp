@@ -109,15 +109,26 @@ int LoRaClass::begin()
 }
 
 
-int LoRaClass::singleTransfer(char *address, char *value, char *buf)
+int LoRaClass::singleTransfer(uint8_t address, uint8_t value, char *buf)
 {
     char response[2];
     int _spiResult;
+    char _address[2] = {address & 0x0F, address>>8};
+    char _value[2] = {value & 0x0F, value>>8};
+
     _spiResult = spiOpen(LoRaClass::spiChannel, LoRaClass::spiFrequency, LoRaClass::spiFlags);
-    spiWrite(_spiResult, address, 2);
-    spiWrite(_spiResult, value, 2);
+    spiWrite(_spiResult, _address, 2);
+    spiWrite(_spiResult, _value, 2);
     spiRead(_spiResult, response, 2);
     spiClose(_spiResult);
+
     buf = response;
+
+    return 0;
+}
+
+int LoRaClass::readRegister(uint8_t address, char *buf)
+{
+    singleTransfer(address & 0x7F, 0x00, buf);
     return 0;
 }
